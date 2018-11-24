@@ -1,0 +1,16 @@
+{
+  "name": "battlenet-wow-api",
+  "version": "1.0.0",
+  "description": "A Node.js library for the BattleNet Community World of Warcraft API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "battlenet",
+    "wow",
+    "battlenet-community"
+  ],
+  "author": "bonta.jacopo@gmail.com",
+  "license": "ISC"
+}
