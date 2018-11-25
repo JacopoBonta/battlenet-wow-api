@@ -554,12 +554,12 @@ module.exports = WoWClient
 // async function main() {
 //   const myRealm = 'pozzo-delleternita'
 //   const myChar = 'Paladrugs'
-//   // const char = await wowClient.characterAppearance(myRealm, myChar)
-//   // console.log(char)
+//   const char = await wowClient.realmStatus()
+//   console.log(char)
 //   // const item = await wowClient.item(1)
 //   // console.log(item)
-//   const realms = await wowClient.realms()
-//   console.log(realms)
+//   // const realms = await wowClient.realms()
+//   // console.log(realms)
   
 // }
 // main()

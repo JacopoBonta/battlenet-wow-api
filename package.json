@@ -1,6 +1,6 @@
 {
   "name": "battlenet-wow-api",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Node.js library for the BattleNet Community World of Warcraft API.",
   "main": "index.js",
   "scripts": {
@@ -9,12 +9,18 @@
   "keywords": [
     "battlenet",
     "wow",
-    "battlenet-community"
+    "battlenet-community",
+    "battlenet-api",
+    "wow-api"
   ],
   "author": "bonta.jacopo@gmail.com",
   "license": "ISC",
   "dependencies": {
     "form-data": "^2.3.3",
     "node-fetch": "^2.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JacopoBonta/battlenet-wow-api"
   }
 }
