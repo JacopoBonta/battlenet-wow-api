@@ -17,6 +17,9 @@ const generateToken = async (clientId, clientSecret, region) => {
   const formData = new FormData()
   formData.append('grant_type', 'client_credentials')
   const res = await fetch(requestURL, { method: 'POST', body: formData })
+  if (!res.ok) {
+    throw new Error("Error generating a new token. Check yours client ID and Secret.")
+  }
   return await res.json()
 }
 /**
@@ -25,7 +28,7 @@ const generateToken = async (clientId, clientSecret, region) => {
  * You must provide your application's Id and Secret obteined from the Blizzar Developer Portal.
  */
 class WoWClient {
-  constructor(clientId, clientSecret, { region = "us", locale = "en_US" }) {
+  constructor(clientId, clientSecret, { region = "us", locale = "en_US" } = {}) {
     this._btnet_client_id = clientId
     this._btnet_client_secret = clientSecret
     this._btnet_region = region.toLowerCase()
@@ -49,7 +52,11 @@ class WoWClient {
     // at each request calculate the time elapsed since the token was created
     this._token_time_elapsed = Math.abs(Math.ceil(this._token_time0 - (new Date().getTime() / 1000)))
     const { access_token } = this._btnet_token
-    const res = await fetch(`https://${this._btnet_region}.api.blizzard.com/wow/${path}?${fields ? `fields=${fields.join(',')}&` : ''}locale=${this._btnet_locale}&access_token=${access_token}`)
+    const requestStr = `https://${this._btnet_region}.api.blizzard.com/wow/${path}?${fields ? `fields=${fields.join(',')}&` : ''}locale=${this._btnet_locale}&access_token=${access_token}`
+    const res = await fetch(requestStr)
+    if (!res.ok) {
+      throw new Error(`There was a problem with the request ${requestStr}`)
+    }
     return await res.json()
   }
   /**
