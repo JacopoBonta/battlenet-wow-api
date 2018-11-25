@@ -395,15 +395,26 @@ class WoWClient {
   /**
  * Return a list of realm objects with detailed information about the status
  */
-  async realmStatus() {
+  async realmStatus(locale) {
     const realmStatus = await this._fetchAPI(`realm/status`)
-    return realmStatus.status ? undefined : realmStatus.realms
+    if (realmStatus.status) return undefined
+    const { realms } = realmStatus
+    if (!locale) return realms
+    const localeRealms = new Array()
+    realms.forEach(realm => {
+      if (realm.locale == locale) {
+        localeRealms.push(realm)
+      }
+    })
+    return localeRealms
   }
   /**
    * Return a map object with realm names and their slugs
    */
-  async realms() {
-    const realmStatus = await this.realmStatus()
+  async realms(locale) {
+    const realmStatus = await this.realmStatus(locale)
+    console.log(realmStatus)
+    if (!realmStatus) return undefined
     const realmMap = new Map()
     realmStatus.forEach(realm => realmMap.set(realm.name, realm.slug))
     return realmMap
@@ -538,15 +549,18 @@ class MissingParameterException extends Error {
   }
 }
 module.exports = WoWClient
+
 // TEST AREA
 // const wowClient = new WoWClient('ce921fd30443481f97b811cea2819bd8', 'bG2XpkKluDexic6X5RlZUFekEHlIsv84', { region: "eu", locale: "it_IT" })
 // async function main() {
 //   const myRealm = 'pozzo-delleternita'
 //   const myChar = 'Paladrugs'
-//   const char = await wowClient.characterAppearance(myRealm, myChar)
-//   console.log(char)
-//   const item = await wowClient.item(1)
-//   console.log(item)
+//   // const char = await wowClient.characterAppearance(myRealm, myChar)
+//   // console.log(char)
+//   // const item = await wowClient.item(1)
+//   // console.log(item)
+//   const realms = await wowClient.realms()
+//   console.log(realms)
   
 // }
 // main()
