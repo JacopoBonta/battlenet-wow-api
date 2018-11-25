@@ -548,21 +548,3 @@ class MissingParameterException extends Error {
   }
 }
 module.exports = WoWClient
-
-// TEST AREA
-// const wowClient = new WoWClient('ce921fd30443481f97b811cea2819bd8', 'bG2XpkKluDexic6X5RlZUFekEHlIsv84', { region: "eu", locale: "it_IT" })
-// async function main() {
-//   const myRealm = 'pozzo-delleternita'
-//   const myChar = 'Paladrugs'
-//   const char = await wowClient.realmStatus()
-//   console.log(char)
-//   // const item = await wowClient.item(1)
-//   // console.log(item)
-//   // const realms = await wowClient.realms()
-//   // console.log(realms)
-  
-// }
-// main()
-//   .catch(error => {
-//     console.error(error)
-//   })
