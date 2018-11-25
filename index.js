@@ -413,7 +413,6 @@ class WoWClient {
    */
   async realms(locale) {
     const realmStatus = await this.realmStatus(locale)
-    console.log(realmStatus)
     if (!realmStatus) return undefined
     const realmMap = new Map()
     realmStatus.forEach(realm => realmMap.set(realm.name, realm.slug))
