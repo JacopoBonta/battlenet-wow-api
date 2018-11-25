@@ -61,6 +61,13 @@ class WoWClient {
     return achievement.status ? null : achievement
   }
   /**
+   * Returns a list of all achievements that characters can earn as well as the category structure and hierarchy.
+   */
+  async availableAchievements() {
+    const response = await this._fetchAPI(`data/character/achievements`)
+    return response.status ? null : response.achievements
+  }
+  /**
    * Retrive item informations in the auction house of the given realm 
    * @param {string} realm The realm slug
    */
@@ -73,22 +80,6 @@ class WoWClient {
     const res = await fetch(url)
     const { auctions } = await res.json()
     return auctions
-  }
-  /**
-   * Return a list of realm objects with detailed information about the status
-   */
-  async realmStatus() {
-    const realmStatus = await this._fetchAPI(`realm/status`)
-    return realmStatus.status ? null : realmStatus.realms
-  }
-  /**
-   * Return a map object with realm names and their slugs
-   */
-  async realms() {
-    const realmStatus = await this.realmStatus()
-    const realmMap = new Map()
-    realmStatus.forEach(realm => realmMap.set(realm.name, realm.slug))
-    return realmMap
   }
   /**
    * Return a list of all supported bosses
@@ -286,17 +277,265 @@ class WoWClient {
     const characterAuditReq = await this.character(realm, charname, ['audit'])
     return characterAuditReq.status ? null : characterAuditReq
   }
+  /**
+   * The guild profile API is the primary way to access guild information.
+   * @param {string} realm The guild realm
+   * @param {string} guildname The guild name
+   */
+  async guildProfile(realm, guildname) {
+    const guildProfile = await this._fetchAPI(`guild/${realm}/${guildname}`)
+    return guildProfile.status ? null : guildProfile
+  }
+  /**
+ * Returns a list of characters that are members of the guild.
+ * @param {string} realm The guild realm
+ * @param {string} guildname The guild name
+ */
+  async guildMembers(realm, guildname) {
+    const members = await this._fetchAPI(`guild/${realm}/${guildname}`, ['members'])
+    return members.status ? null : members
+  }
+  /**
+ * A set of data structures that describe the achievements earned by the guild.
+ * @param {string} realm The guild realm
+ * @param {string} guildname The guild name
+ */
+  async guildAchievements(realm, guildname) {
+    const achievements = await this._fetchAPI(`guild/${realm}/${guildname}`, ['achievements'])
+    return achievements.status ? null : achievements
+  }
+  /**
+ * A set of data structures that describe the guild's news feed.
+ * @param {string} realm The guild realm
+ * @param {string} guildname The guild name
+ */
+  async guildNews(realm, guildname) {
+    const news = await this._fetchAPI(`guild/${realm}/${guildname}`, ['news'])
+    return news.status ? null : news
+  }
+  /**
+ * The top three challenge mode guild run times for each challenge mode map.
+ * @param {string} realm The guild realm
+ * @param {string} guildname The guild name
+ */
+  async guildChallenge(realm, guildname) {
+    const challenge = await this._fetchAPI(`guild/${realm}/${guildname}`, ['challenge'])
+    return challenge.status ? null : challenge
+  }
+  /**
+   * The item API provides detailed item information, including item set information.
+   * @param {number} id Item Id
+   */
+  async item(id) {
+    const item = await this._fetchAPI(`item/${id}`)
+    return item.status ? null : item
+  }
+  /**
+   * The item API provides detailed item information, including item set information.
+   * @param {number} id Set Id
+   */
+  async itemSet(id) {
+    const item = await this._fetchAPI(`item/set/${id}`)
+    return item.status ? null : item
+  }
+  /**
+   * Returns a list of all supported mounts.
+   */
+  async mounts() {
+    const mounts = await this._fetchAPI(`mount/`)
+    return mounts.status ? null : mounts
+  }
+  /**
+   * Returns a list of all supported battle and vanity pets.
+   */
+  async pets() {
+    const pets = await this._fetchAPI('pet/')
+    return pets.status ? null : pets
+  }
+  /**
+   * Returns data about a individual battle pet ability ID.
+   * @param {number} abilityId The ID of the ability to retrieve.
+   */
+  async petAbility(abilityId) {
+    const ability = await this._fetchAPI(`pet/ability/${abilityId}`)
+    return ability.status ? null : ability
+  }
+  /**
+   * Returns data about an individual pet species. 
+   * @param {number} speciesId The species for which to retrieve data.
+   */
+  async petSpecies(speciesId) {
+    const species = await this._fetchAPI(`pet/species/${speciesId}`)
+    return species.status ? null : species
+  }
+  /**
+   * Returns detailed information about a given species of pet.
+   * @param {number} speciesId The pet's species ID. This can be found by querying a user's list of pets via characterPets().
+   */
+  async petStats(speciesId) {
+    const stats = await this._fetchAPI(`pet/stats/${speciesId}`)
+    return stats.status ? null : stats
+  }
+  /**
+   * The Leaderboard API endpoint provides leaderboard information for the 2v2, 3v3, 5v5, and Rated Battleground leaderboards.
+   * @param {string} bracket The type of leaderboard to retrive. Accepter values are 2v2, 3v3, 5v5, rbg.
+   */
+  async pvpLeaderboards(bracket) {
+    if (bracket != "2v2" || bracket != "3v3" || bracket != "5v5" || bracket != "rbg") {
+      throw new Error("Invalid bracket entry. Accepted entries are 2v2, 3v3, 5v5 and rbg.")
+    }
+    const leaderboard = await this._fetchAPI(`leaderboard/${bracket}`)
+    return leaderboard.status ? null : leaderboard
+  }
+  /**
+   * Returns metadata for a specified quest.
+   * @param {number} id The ID of the quest to retrive.
+   */
+  async quest(id) {
+    const quest = await this._fetchAPI(`quest/${id}`)
+    return quest.status ? null : quest
+  }
+  /**
+ * Return a list of realm objects with detailed information about the status
+ */
+  async realmStatus() {
+    const realmStatus = await this._fetchAPI(`realm/status`)
+    return realmStatus.status ? null : realmStatus.realms
+  }
+  /**
+   * Return a map object with realm names and their slugs
+   */
+  async realms() {
+    const realmStatus = await this.realmStatus()
+    const realmMap = new Map()
+    realmStatus.forEach(realm => realmMap.set(realm.name, realm.slug))
+    return realmMap
+  }
+  /**
+   * Returns basic recipe information.
+   * @param {number} id Unique ID for the desired recipe.
+   */
+  async recipe(id) {
+    const recipe = await this._fetchAPI(`recipe/${id}`)
+    return recipe.status ? null : recipe
+  }
+  /**
+   * Returns information about spells.
+   * @param {number} id The ID of the spell to retrive.
+   */
+  async spell(id) {
+    const spell = await this._fetchAPI(`spell/${id}`)
+    return spell.status ? null : spell
+  }
+  /**
+   * Returns a list of all supported zones and their bosses. 
+   */
+  async zones() {
+    const zones = await this._fetchAPI(`zones/`)
+    return zones.status ? null : zones
+  }
+  /**
+   * Returns information about zones.
+   * @param {number} id The ID of the zone to retrive.
+   */
+  async zone(id) {
+    const zone = await this._fetchAPI(`zones/${id}`)
+    return zone.status ? null : zone
+  }
+  /** 
+   * Returns a list of battlegroups for the specified region.
+   */
+  async battlegroups() {
+    const battlegroups = await this._fetchAPI('data/battlegroups/')
+    return battlegroups.status ? null : battlegroups
+  }
+  /**
+   * Returns a list of races and their associated faction, name, uniqueID, and skin.
+   */
+  async races() {
+    const racesObj = await this._fetchAPI('data/character/races')
+    return racesObj.status ? null : racesObj.races
+  }
+  /**
+   * Returns information about a race specified by its ID.
+   * @param {number} id The ID of the race to retrive.
+   */
+  async race(id) {
+    const races = await this.races()
+    return races.find(race => race.id == id)
+  }
+  /**
+   * Returns a list of character classes.
+   */
+  async classes() {
+    const classesObj = await this._fetchAPI('data/character/classes')
+    return classesObj.status ? null : classesObj.classes
+  }
+  /**
+   * Returns information about a specific character class.
+   * @param {number} id The ID of the character class to retrive
+   */
+  async class(id) {
+    const classes = await this.classes()
+    return classes.find(cla$$ => cla$$.id == id)
+  }
+  /**
+   * The guild rewards data API provides a list of all guild rewards.
+   */
+  async guildRewards() {
+    const rewards = await this._fetchAPI('data/guild/rewards')
+    return rewards.status ? null : rewards
+  }
+  /**
+   * The guild rewards data API provides a list of all guild rewards.
+   */
+  async guildPerks() {
+    const perksObj = await this._fetchAPI('data/guild/perks')
+    return perksObj.status ? null : perksObj.perks
+  }
+  /**
+   * Returns a list of all guild achievements as well as the category structure and hierarchy.
+   */
+  async guildAchievements() {
+    const achievementObj = await this._fetchAPI('data/guild/achievements')
+    return achievementObj.status ? null : this.achievementObj.achievements
+  }
+  /**
+   * Returns a list of item classes.
+   */
+  async itemClasses() {
+    const itemClassesObj = await this._fetchAPI('data/item/classes')
+    return itemClassesObj.status ? null : itemClassesObj.classes
+  }
+  /**
+   * Returns a list of talents, specs, and glyphs for each class.
+   * @param {number} classID The ID of the class for retriving specific talents.
+   */
+  async talents(classID = undefined) {
+    const talents = await this._fetchAPI('data/talents')
+    if (talents.status) return null
+    else if (classID) {
+      return talents[classID]
+    } else {
+      return talents
+    }
+  }
+  /**
+   * Returns a list of the different battle pet types, including what they are strong and weak against.
+   */
+  async petTypes() {
+    const petTypesObj = await this._fetchAPI('data/pet/types')
+    return petTypesObj.status ? null : petTypesObj.petTypes
+  }
 }
 // module.exports = WoWClient
 // TEST AREA
-// const wowClient = new WoWClient('ce921fd30443481f97b811cea2819bd8', 'bG2XpkKluDexic6X5RlZUFekEHlIsv84', { region: "eu", locale: "it_IT" })
-// async function main() {
-//   const audit = await wowClient.characterAudit('pozzo-delleternita', 'Paladrugs')
-//   console.log(audit)
-//   const mounts = await wowClient.characterMounts('pozzo-delleternita', 'Paladrugs')
-//   console.log(mounts)
-// }
-// main()
-//   .catch(error => {
-//     console.error(error.message)
-//   })
+const wowClient = new WoWClient('ce921fd30443481f97b811cea2819bd8', 'bG2XpkKluDexic6X5RlZUFekEHlIsv84', { region: "eu", locale: "it_IT" })
+async function main() {
+  const achievement = await wowClient.achievement(15301)
+  console.log(achievement)
+}
+main()
+  .catch(error => {
+    console.error(error.message)
+  })
